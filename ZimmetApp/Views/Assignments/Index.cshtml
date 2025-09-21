@@ -1,0 +1,60 @@
+﻿@model IEnumerable<ZimmetApp.Models.Assignment>
+@{
+    ViewData["Title"] = "Zimmet Listesi";
+}
+
+<div class="d-flex align-items-center justify-content-between">
+    <h2>Zimmet Listesi</h2>
+    <a asp-action="Manage" class="btn btn-success">Yeni Zimmet</a>
+</div>
+<hr />
+
+<form method="get" class="mb-3 d-flex gap-2">
+    <input name="q" class="form-control" placeholder="Kişi/Cihaz/Hat ara..." value="@Context.Request.Query["q"]" />
+    <button class="btn btn-outline-primary" type="submit">Ara</button>
+</form>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Kişi</th>
+            <th>Tür</th>
+            <th>Ad</th>
+            <th>Seri/Hat</th>
+            <th>Tarih</th>
+            <th>Not</th>
+            <th style="width:160px;">İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (!Model.Any())
+    {
+        <tr><td colspan="8" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+    }
+    else
+    {
+        foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.Id</td>
+                <td>@a.Person?.FullName</td>
+                <td>@a.ItemType</td>
+                <td>@a.ItemName</td>
+                <td>@a.SerialOrLine</td>
+                <td>@a.AssignedDate.ToString("dd.MM.yyyy")</td>
+                <td>@a.Notes</td>
+                <td>
+                    <a asp-action="Manage" asp-route-id="@a.Id" class="btn btn-sm btn-primary">Düzenle</a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@a.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Silinsin mi?');">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>

@@ -1,0 +1,94 @@
+﻿@model ZimmetApp.Models.Assignment
+@using ZimmetApp.Models
+@{
+    ViewData["Title"] = "Zimmet Giriş";
+    var persons = ViewBag.Persons as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    int? selectedPersonId = ViewBag.SelectedPersonId as int?;
+}
+
+<h2>Zimmet Giriş</h2>
+<hr />
+
+@if (TempData["PersonError"] != null)
+{
+    <div class="alert alert-danger">@TempData["PersonError"]</div>
+}
+
+<div class="card mb-3">
+    <div class="card-header fw-bold">Kişi Ekle</div>
+    <div class="card-body">
+        <form asp-action="AddPerson" method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-md-4">
+                <input name="fullName" class="form-control" placeholder="Ad Soyad *" required />
+            </div>
+            <div class="col-md-3">
+                <input name="department" class="form-control" placeholder="Birim (opsiyonel)" />
+            </div>
+            <div class="col-md-3">
+                <input name="phone" class="form-control" placeholder="Telefon (opsiyonel)" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-outline-success" type="submit">Ekle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<form asp-action="Manage" method="post">
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="mb-3">
+        <label class="form-label">Kişi</label>
+        <select asp-for="PersonId" class="form-select" asp-items="persons">
+            <option value="">— Kişi seçin —</option>
+        </select>
+        <span asp-validation-for="PersonId" class="text-danger"></span>
+        @if (selectedPersonId.HasValue)
+        {
+            <script>
+                // Yeni kişi eklendiyse otomatik seç
+                document.addEventListener('DOMContentLoaded', function () {
+                    const sel = document.querySelector('select[name="PersonId"]');
+                    if (sel) sel.value = '@selectedPersonId.Value';
+                });
+            </script>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ItemType" class="form-label">Ürün Türü</label>
+        <select asp-for="ItemType" class="form-select" asp-items="Html.GetEnumSelectList<ItemType>()"></select>
+        <span asp-validation-for="ItemType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ItemName" class="form-label"></label>
+        <input asp-for="ItemName" class="form-control" />
+        <span asp-validation-for="ItemName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Seri No / Hat No</label>
+        <input asp-for="SerialOrLine" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AssignedDate" class="form-label">Zimmet Tarihi</label>
+        <input asp-for="AssignedDate" type="date" class="form-control" />
+        <span asp-validation-for="AssignedDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" rows="3" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
